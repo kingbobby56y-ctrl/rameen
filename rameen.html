@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>kuch hai yahan 👀</title>
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Syne:wght@400;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  background:#0e0e0e;
+  font-family:'Syne',sans-serif;
+  color:#f0f0f0;
+  overflow-x:hidden;
+}
+
+/* ── LOADER ── */
+#loader{
+  position:fixed;inset:0;background:#0e0e0e;
+  z-index:9999;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:16px;
+  transition:opacity 0.6s ease;
+}
+.loader-label{font-family:'Caveat',cursive;font-size:24px;color:#ff3d7f;}
+.loader-bar{width:200px;height:2px;background:#222;border-radius:2px;overflow:hidden;}
+.loader-fill{height:100%;background:#ff3d7f;animation:fillBar 2.2s ease forwards;}
+@keyframes fillBar{0%{width:0%;}40%{width:35%;}70%{width:65%;}100%{width:100%;}}
+.loader-text{font-family:'IBM Plex Mono',monospace;font-size:12px;color:#444;letter-spacing:0.1em;}
+.blink{animation:blink 1s step-end infinite;}
+@keyframes blink{50%{opacity:0;}}
+
+/* ── FAKE CLOSE ── */
+#fakeClose{
+  position:fixed;top:16px;right:16px;z-index:1000;
+  width:36px;height:36px;background:#1a1a1a;
+  border:1px solid #2a2a2a;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;cursor:pointer;color:#555;
+  transition:background 0.2s;
+}
+#fakeClose:hover{background:#2a2a2a;}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(80px);
+  background:#1a1a1a;border:1px solid #ff3d7f55;
+  border-radius:14px;padding:12px 22px;
+  font-family:'Caveat',cursive;font-size:19px;color:#ff3d7f;
+  white-space:nowrap;z-index:9999;pointer-events:none;
+  transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);
+}
+#toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── SCENES ── */
+.scene{
+  min-height:100vh;padding:60px 24px;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  position:relative;overflow:hidden;text-align:center;
+}
+
+/* ── S1: HOOK ── */
+#s1{background:#0e0e0e;}
+
+.s1-eyebrow{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:12px;letter-spacing:0.15em;color:#444;
+  text-transform:uppercase;margin-bottom:28px;
+}
+
+.s1-big{
+  font-size:clamp(72px,18vw,160px);
+  font-weight:800;line-height:0.9;letter-spacing:-4px;color:#f0f0f0;
+}
+.s1-big .pink{color:#ff3d7f;}
+
+/* accident quote box */
+.accident-quote{
+  margin-top:32px;
+  max-width:500px;
+  border:1px solid #ff3d7f33;
+  border-radius:16px;
+  padding:24px 28px;
+  background:#ff3d7f08;
+  position:relative;
+}
+.accident-quote::before{
+  content:'"';
+  position:absolute;top:-18px;left:20px;
+  font-family:'Caveat',cursive;
+  font-size:72px;color:#ff3d7f22;line-height:1;
+}
+.accident-quote p{
+  font-family:'Caveat',cursive;
+  font-size:clamp(18px,3.5vw,26px);
+  color:#ddd;line-height:1.6;
+  font-style:italic;
+}
+.accident-quote p .hi{color:#ff3d7f;font-style:normal;font-weight:600;}
+
+.scroll-nudge{
+  margin-top:48px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;letter-spacing:0.2em;color:#2a2a2a;text-transform:uppercase;
+  animation:nudge 2s ease-in-out infinite;
+}
+@keyframes nudge{0%,100%{transform:translateY(0);}50%{transform:translateY(7px);}}
+
+/* ── S2: ROAST ── */
+#s2{background:#111;justify-content:center;}
+
+.roast-single{
+  max-width:500px;width:100%;
+  background:#1c1c1c;border:1px solid #262626;
+  border-radius:20px;border-bottom-left-radius:5px;
+  padding:24px 26px;text-align:left;
+}
+.roast-single::before{
+  content:'moiz 😏';display:block;
+  font-size:11px;color:#ff3d7f;margin-bottom:10px;
+  font-family:'IBM Plex Mono',monospace;letter-spacing:0.05em;
+}
+.roast-single p{
+  font-family:'Caveat',cursive;
+  font-size:clamp(20px,4vw,28px);
+  color:#f0f0f0;line-height:1.5;
+}
+.roast-single .cringe{
+  display:inline-block;
+  margin-top:10px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:#444;letter-spacing:0.1em;
+}
+
+/* ── S3: SORRY ── */
+#s3{background:#0e0e0e;}
+.sorry-h{
+  font-family:'Caveat',cursive;
+  font-size:clamp(56px,13vw,120px);font-weight:700;
+  color:#f0f0f0;line-height:1;margin-bottom:20px;
+}
+.sorry-p{
+  font-family:'Caveat',cursive;
+  font-size:clamp(17px,3.5vw,26px);
+  color:#555;max-width:380px;line-height:1.7;margin-bottom:36px;
+}
+.sorry-p em{color:#ff3d7f;font-style:normal;}
+.btn-scroll{
+  display:inline-block;background:#ff3d7f;color:white;
+  font-family:'Syne',sans-serif;font-size:14px;font-weight:700;
+  letter-spacing:0.05em;padding:14px 36px;border-radius:50px;
+  cursor:pointer;border:none;
+  transition:transform 0.2s,box-shadow 0.2s;
+  box-shadow:0 0 0 rgba(255,61,127,0);
+}
+.btn-scroll:hover{transform:scale(1.04);box-shadow:0 0 30px rgba(255,61,127,0.35);}
+
+/* ── S4: REAL ── */
+#s4{background:linear-gradient(170deg,#130008 0%,#0e0e0e 100%);}
+.real-tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;letter-spacing:0.2em;color:#ff3d7f;
+  text-transform:uppercase;margin-bottom:20px;
+}
+.real-h{
+  font-size:clamp(38px,8vw,80px);
+  font-weight:800;line-height:1;letter-spacing:-2px;
+  color:#f0f0f0;margin-bottom:24px;
+}
+.real-h .it{font-style:italic;color:#ff3d7f;display:block;}
+.real-card{
+  font-family:'Caveat',cursive;
+  font-size:clamp(18px,3.5vw,26px);
+  color:#ddd;line-height:1.75;
+  max-width:500px;
+  background:#161616;
+  border-left:3px solid #ff3d7f;
+  border-radius:0 14px 14px 0;
+  padding:24px 28px;text-align:left;
+}
+
+/* ── S5: COMMENT ── */
+#s5{background:#111;gap:24px;}
+.comm-tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:#444;letter-spacing:0.15em;text-transform:uppercase;
+}
+.comm-h{
+  font-family:'Caveat',cursive;
+  font-size:clamp(26px,5.5vw,50px);color:#f0f0f0;
+}
+.ig-mock{
+  width:100%;max-width:460px;
+  background:#161616;border:1px solid #222;border-radius:18px;overflow:hidden;
+}
+.ig-bar{
+  padding:12px 16px;border-bottom:1px solid #1e1e1e;
+  display:flex;align-items:center;gap:8px;
+}
+.ig-dot{width:9px;height:9px;border-radius:50%;}
+.ig-bar-label{font-size:11px;color:#333;margin-left:6px;font-family:'IBM Plex Mono',monospace;}
+.ig-row{display:flex;align-items:flex-start;gap:12px;padding:16px;}
+.ig-row+.ig-row{border-top:1px solid #1c1c1c;}
+.ig-row.rep{padding-left:50px;}
+.ig-av{
+  width:38px;height:38px;border-radius:50%;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;font-weight:800;color:white;
+  background:linear-gradient(135deg,#ff3d7f,#c026d3);
+}
+.ig-av.r{background:linear-gradient(135deg,#f9a8d4,#a78bfa);font-size:20px;}
+.ig-body{flex:1;}
+.ig-un{font-size:13px;font-weight:700;color:#f0f0f0;}
+.ig-tick{color:#3b9eff;font-size:11px;}
+.ig-time{font-size:11px;color:#3a3a3a;font-weight:400;margin-left:5px;}
+.ig-txt{font-size:15px;color:#bbb;margin-top:4px;line-height:1.5;}
+.ig-txt .at{color:#3b9eff;}
+.ig-r{display:flex;flex-direction:column;align-items:center;gap:3px;}
+.ig-hrt{font-size:17px;}
+.ig-cnt{font-size:11px;color:#3a3a3a;}
+.comm-cap{
+  font-family:'Caveat',cursive;
+  font-size:clamp(16px,3vw,22px);color:#444;
+}
+.comm-cap span{color:#ff3d7f;}
+
+/* ── S6: END ── */
+#s6{background:#0e0e0e;gap:14px;}
+.end-tag{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:#2a2a2a;letter-spacing:0.2em;text-transform:uppercase;
+}
+.end-h{
+  font-size:clamp(44px,10vw,100px);
+  font-weight:800;line-height:0.95;letter-spacing:-3px;color:#f0f0f0;
+}
+.end-h span{display:block;}
+.end-h .pk{color:#ff3d7f;font-style:italic;}
+.end-script{
+  font-family:'Caveat',cursive;
+  font-size:clamp(20px,4vw,36px);
+  color:#444;margin-top:10px;
+}
+/* dil ka rasta box */
+.dil-box{
+  margin-top:28px;
+  max-width:420px;
+  border:1px dashed #ff3d7f44;
+  border-radius:14px;padding:18px 24px;
+  background:#ff3d7f06;
+}
+.dil-box p{
+  font-family:'Caveat',cursive;
+  font-size:clamp(20px,4vw,30px);
+  color:#ff3d7f;
+}
+.dil-box .sub{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:#333;letter-spacing:0.1em;
+  margin-top:8px;display:block;
+}
+.end-sig{
+  margin-top:32px;
+  font-family:'IBM Plex Mono',monospace;
+  font-size:13px;color:#2a2a2a;letter-spacing:0.1em;
+}
+.end-sig strong{color:#666;}
+
+/* ── QUIZ POPUP ── */
+#quiz-overlay{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.85);
+  backdrop-filter:blur(6px);
+  z-index:8000;
+  display:flex;align-items:center;justify-content:center;
+  padding:24px;
+  opacity:0;pointer-events:none;
+  transition:opacity 0.4s ease;
+}
+#quiz-overlay.show{opacity:1;pointer-events:all;}
+.quiz-box{
+  background:#161616;
+  border:1px solid #2a2a2a;
+  border-radius:24px;
+  padding:36px 28px;
+  max-width:360px;width:100%;
+  text-align:center;
+}
+.quiz-q{
+  font-family:'Caveat',cursive;
+  font-size:clamp(22px,5vw,32px);
+  color:#f0f0f0;margin-bottom:8px;
+}
+.quiz-sub{
+  font-family:'IBM Plex Mono',monospace;
+  font-size:11px;color:#444;letter-spacing:0.1em;
+  margin-bottom:28px;
+}
+.quiz-btns{display:flex;gap:14px;justify-content:center;align-items:center;min-height:48px;}
+.q-btn{
+  padding:12px 32px;border-radius:50px;border:none;
+  font-family:'Syne',sans-serif;font-size:15px;font-weight:700;
+  cursor:pointer;transition:transform 0.2s,opacity 0.3s;
+}
+.q-yes{background:#ff3d7f;color:white;}
+.q-no{background:#1e1e1e;color:#888;border:1px solid #333;}
+.q-btn:hover{transform:scale(1.05);}
+.quiz-msg{
+  font-family:'Caveat',cursive;
+  font-size:18px;color:#ff3d7f;
+  margin-top:16px;min-height:26px;
+}
+
+/* ── RAGE TOAST ── */
+#rage-toast{
+  position:fixed;top:28px;left:50%;
+  transform:translateX(-50%) translateY(-80px);
+  background:#1a1a1a;border:1px solid #ff3d7f55;
+  border-radius:14px;padding:12px 22px;
+  font-family:'Caveat',cursive;font-size:19px;color:#ff3d7f;
+  white-space:nowrap;z-index:9999;pointer-events:none;
+  transition:transform 0.4s cubic-bezier(.34,1.56,.64,1);
+}
+#rage-toast.show{transform:translateX(-50%) translateY(0);}
+
+/* ── FLYING HEARTS ── */
+.fly-heart{
+  position:fixed;
+  font-size:28px;
+  pointer-events:none;
+  z-index:7000;
+  animation:flyUp 1.2s ease forwards;
+  user-select:none;
+}
+@keyframes flyUp{
+  0%  {transform:translateY(0) scale(0.5) rotate(-10deg);opacity:1;}
+  60% {transform:translateY(-120px) scale(1.2) rotate(10deg);opacity:1;}
+  100%{transform:translateY(-220px) scale(0.8) rotate(-5deg);opacity:0;}
+}
+
+/* grain */
+body::after{
+  content:'';position:fixed;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events:none;z-index:9990;opacity:0.5;
+}
+</style>
+</head>
+<body>
+
+<div id="loader">
+  <p class="loader-label">Rameen ka trap load ho raha hai... 🎀</p>
+  <div class="loader-bar"><div class="loader-fill"></div></div>
+  <p class="loader-text">please wait <span class="blink">_</span></p>
+</div>
+
+<div id="fakeClose" onclick="tryClose()">✕</div>
+<div id="toast">nahi nahi yahan se nahi jayegi 😭</div>
+<div id="rage-toast">itna gussa? relax Rameen 😭</div>
+
+<!-- QUIZ POPUP -->
+<div id="quiz-overlay">
+  <div class="quiz-box">
+    <p class="quiz-q">do you want to continue? 🙂</p>
+    <p class="quiz-sub">choose carefully.</p>
+    <div class="quiz-btns">
+      <button class="q-btn q-yes" onclick="quizYes()">Yes ✅</button>
+      <button class="q-btn q-no" id="noBtn" onclick="quizNo()">No 🙄</button>
+    </div>
+    <p class="quiz-msg" id="quizMsg"></p>
+  </div>
+</div>
+
+<!-- S1: HOOK -->
+<section class="scene" id="s1">
+  <p class="s1-eyebrow"><span class="blink">●</span> &nbsp; someone sent you a link. read it.</p>
+  <h1 class="s1-big">Ra<span class="pink">meen</span></h1>
+
+  <div class="accident-quote">
+    <p>
+      You are one of those <span class="hi">accidents</span> that I want every day —<br/>
+      if you are the person I am going to collide with.
+    </p>
+  </div>
+
+  <p class="scroll-nudge">↓ &nbsp; scroll &nbsp; ↓</p>
+</section>
+
+<!-- S2: ROAST (only one bubble) -->
+<section class="scene" id="s2">
+  <div class="roast-single">
+    <p>
+      "Beta meri fielding set nahi karni —<br/>
+      warna Multan se kabhi wapas nahi aana main ney" 🏏
+    </p>
+    <span class="cringe">(cringe, I know 😭)</span>
+  </div>
+</section>
+
+<!-- S3: SORRY -->
+<section class="scene" id="s3">
+  <h2 class="sorry-h">okay<br/>sorry 😭</h2>
+  <p class="sorry-p">
+    but scroll karo —<br/>
+    <em>ek baar aur neeche dekh lo.</em>
+  </p>
+  <button class="btn-scroll" onclick="document.getElementById('s4').scrollIntoView({behavior:'smooth'})">
+    there's something below 👇
+  </button>
+</section>
+
+<!-- S4: REAL -->
+<section class="scene" id="s4">
+  <p class="real-tag">the real part 🌸</p>
+  <h2 class="real-h">
+    Moiz<br/>
+    <span class="it">hamesha sath hai</span>
+  </h2>
+  <div class="real-card">
+    How could anyone say that comments are irrelevant?<br/><br/>
+    <strong>I got my khas shaks from the comments bhaeee 😭</strong>
+  </div>
+</section>
+
+<!-- S5: COMMENT ORIGIN -->
+<section class="scene" id="s5">
+  <p class="comm-tag">where it all started</p>
+  <h2 class="comm-h">that comment 🫣</h2>
+
+  <div class="ig-mock">
+    <div class="ig-bar">
+      <div class="ig-dot" style="background:#ff5f56;"></div>
+      <div class="ig-dot" style="background:#ffbd2e;"></div>
+      <div class="ig-dot" style="background:#27c93f;"></div>
+      <span class="ig-bar-label">instagram · comments</span>
+    </div>
+    <div class="ig-row">
+      <div class="ig-av">M</div>
+      <div class="ig-body">
+        <div class="ig-un">moizzz.qi <span class="ig-tick">✔</span><span class="ig-time">1w</span></div>
+        <div class="ig-txt">"Kitaabon pr dhool lagny sey kahaniyan khtm nahi hoti ladly" 👑🔥💀</div>
+      </div>
+      <div class="ig-r"><span class="ig-hrt">❤️</span><span class="ig-cnt">1,874</span></div>
+    </div>
+    <div class="ig-row rep">
+      <div class="ig-av r">🌸</div>
+      <div class="ig-body">
+        <div class="ig-un">_.rameenx<span class="ig-time">1w</span></div>
+        <div class="ig-txt"><span class="at">@moizzz.qi</span> 🥺💗🤌🎀</div>
+      </div>
+      <div class="ig-r"><span class="ig-hrt">🤍</span></div>
+    </div>
+  </div>
+
+  <p class="comm-cap">this is where it started — <span>and Moiz never looked back 🎀</span></p>
+</section>
+
+<!-- S6: FINALE -->
+<section class="scene" id="s6">
+  <p class="end-tag">for rameen — always</p>
+  <h2 class="end-h">
+    <span>some things are</span>
+    <span class="pk">accidental.</span>
+  </h2>
+  <p class="end-script">friendship is one of them ✨</p>
+
+  <div class="dil-box">
+    <p>dil ka rasta kya hai apky? 😭</p>
+    <span class="sub">ab tou bata dain 😭</span>
+  </div>
+
+  <p class="end-sig">— tumhara <strong>Moiz</strong> 💗</p>
+</section>
+
+<script>
+// ── LOADER ──
+window.addEventListener('load',()=>{
+  setTimeout(()=>{
+    const l=document.getElementById('loader');
+    l.style.opacity='0';
+    setTimeout(()=>{
+      l.style.display='none';
+      // show quiz after loader disappears
+      setTimeout(()=>{
+        document.getElementById('quiz-overlay').classList.add('show');
+      },1200);
+    },600);
+  },2500);
+});
+
+// ── FAKE CLOSE ──
+let cc=0;
+const msgs=[
+  "nahi nahi yahan se nahi jayegi 😭",
+  "seriously? try mat karo 🙅",
+  "Rameen... nahi hoga yeh 🫣",
+  "okay ab band karna band karo 💀",
+  "scroll karo. bas. 🎀"
+];
+function tryClose(){
+  const t=document.getElementById('toast');
+  t.textContent=msgs[cc%msgs.length];cc++;
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ── QUIZ ──
+let noCount=0;
+const noMsgs=["wrong option. try again. 🙂","bro. NO nahi hoga. 💀","last warning 😭","okay fine keep trying 🫣","...","seriously?","YES wala dabao Rameen 🎀"];
+function quizNo(){
+  const msg=document.getElementById('quizMsg');
+  const btn=document.getElementById('noBtn');
+  msg.textContent=noMsgs[Math.min(noCount,noMsgs.length-1)];
+  noCount++;
+  // hide No button after 3 taps
+  if(noCount>=3){
+    btn.style.transition='opacity 0.4s,transform 0.4s';
+    btn.style.opacity='0';
+    btn.style.transform='scale(0.5)';
+    btn.style.pointerEvents='none';
+  }
+}
+function quizYes(){
+  document.getElementById('quiz-overlay').classList.remove('show');
+}
+
+// ── RAGE TAP DETECTOR ──
+let tapTimes=[];
+let rageTimer=null;
+document.addEventListener('touchstart',()=>{
+  const now=Date.now();
+  tapTimes.push(now);
+  tapTimes=tapTimes.filter(t=>now-t<1500);
+  if(tapTimes.length>=5){
+    tapTimes=[];
+    const rt=document.getElementById('rage-toast');
+    rt.classList.add('show');
+    clearTimeout(rageTimer);
+    rageTimer=setTimeout(()=>rt.classList.remove('show'),2400);
+  }
+});
+// also works on desktop
+document.addEventListener('click',(e)=>{
+  const now=Date.now();
+  tapTimes.push(now);
+  tapTimes=tapTimes.filter(t=>now-t<1500);
+  if(tapTimes.length>=5){
+    tapTimes=[];
+    const rt=document.getElementById('rage-toast');
+    rt.classList.add('show');
+    clearTimeout(rageTimer);
+    rageTimer=setTimeout(()=>rt.classList.remove('show'),2400);
+  }
+});
+
+// ── DOUBLE TAP HEARTS ──
+const hearts=['💗','🌸','💕','✨','🎀','💖'];
+let lastTap=0;
+document.addEventListener('touchend',(e)=>{
+  const now=Date.now();
+  if(now-lastTap<320){
+    const touch=e.changedTouches[0];
+    spawnHearts(touch.clientX,touch.clientY);
+  }
+  lastTap=now;
+});
+// desktop double click
+document.addEventListener('dblclick',(e)=>{
+  spawnHearts(e.clientX,e.clientY);
+});
+function spawnHearts(x,y){
+  for(let i=0;i<5;i++){
+    setTimeout(()=>{
+      const h=document.createElement('div');
+      h.className='fly-heart';
+      h.textContent=hearts[Math.floor(Math.random()*hearts.length)];
+      const offsetX=(Math.random()-0.5)*60;
+      h.style.left=(x+offsetX-14)+'px';
+      h.style.top=(y-14)+'px';
+      h.style.animationDuration=(0.9+Math.random()*0.5)+'s';
+      document.body.appendChild(h);
+      setTimeout(()=>h.remove(),1600);
+    },i*80);
+  }
+}
+</script>
+</body>
+</html>
